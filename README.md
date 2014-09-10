@@ -4,9 +4,7 @@ This is a [Fluentd](http://www.fluentd.org) plugin to collect Docker metrics per
 
 ## How it works
 
-It's assumed to run on the host server. It periodically runs `docker ps --no-trunc -q`
-to get a list of running Docker container IDs, and it looks at `/sys/fs/cgroups/<metric_type>/docker/<container_id>/`
-for relevant stats. You can say this is an implementation of the metric collection strategy outlined in [this blog post](http://blog.docker.com/2013/10/gathering-lxc-docker-containers-metrics/).
+It's assumed to run on the host server. It periodically runs `docker ps --no-trunc -q` to get a list of running Docker container IDs, and it looks at `/sys/fs/cgroups/<metric_type>/docker/<container_id>/` for relevant stats, `/var/lib/docker/execdriver/native` to get docker interface name and `/sys/class/net` to read network statistics. You can say this is an implementation of the metric collection strategy outlined in [this blog post](http://blog.docker.com/2013/10/gathering-lxc-docker-containers-metrics/).
 
 ## Installing
 
