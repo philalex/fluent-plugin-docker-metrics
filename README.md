@@ -24,14 +24,23 @@ to be uploaded on Rubygems
 ## Parameters
 
 * **stats_interval**: how often to poll Docker containers for stats. The default is every minute.
-* **cgroup_path**: The path to cgroups pseudofiles. The default is `sys/fs/cgroup`.
+* **cgroup_path**: The path to cgroups pseudofiles. The default is `/sys/fs/cgroup`.
 * **tag_prefix**: The tag prefix. The default value is "docker"
-
+* **docker_socket**: docker socker path. Default: `unix:///var/run/docker.sock)`
+* **docker_network_path: path to network informations. Default: `/sys/class/net`
+* **docker_infos_path: path to json files container.json and state.json . Default: `/var/lib/docker/execdriver/native`
 ## Example output
 
 ```
-2014-06-26 18:16:43 +0000 docker.memory.stat: {"key":"memory_stat_total_active_anon","value":26025984,"source":"docker:precise64:b7f17c393775476bc0999cb6dcb4c6416e94b0473317375b9a245985dc6e91c5"}
-2014-06-26 18:16:43 +0000 docker.memory.stat: {"key":"memory_stat_total_inactive_file","value":131072,"source":"docker:precise64:b7f17c393775476bc0999cb6dcb4c6416e94b0473317375b9a245985dc6e91c5"}
+20140909T123247+0000    docker.memory.stat      {"key":"total_unevictable","value":0,"type":"jauge","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
+20140909T123247+0000    docker.cpuacct.stat     {"key":"user","value":1094,"type":"jauge","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
+20140909T123247+0000    docker.cpuacct.stat     {"key":"system","value":302,"type":"jauge","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
+20140909T123247+0000    docker.network.stat     {"key":"rx_bytes","value":648,"type":"counter","if_name":"veth8590","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
+20140909T123247+0000    docker.network.stat     {"key":"tx_bytes","value":0,"type":"counter","if_name":"veth8590","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
+20140909T123247+0000    docker.network.stat     {"key":"tx_packets","value":0,"type":"counter","if_name":"veth8590","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
+20140909T123247+0000    docker.network.stat     {"key":"rx_packets","value":8,"type":"counter","if_name":"veth8590","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
+20140909T123247+0000    docker.network.stat     {"key":"tx_errors","value":0,"type":"counter","if_name":"veth8590","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
+20140909T123247+0000    docker.network.stat     {"key":"rx_errors","value":0,"type":"counter","if_name":"veth8590","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
 ```
 
-In particular, each event is a key-value pair of individual metrics. Also, it has a field whose value is "\<tag_prefix\>:\<hostname\>:\<container_id\>"
+In particular, each event is a key-value pair of individual metrics.
