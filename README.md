@@ -26,7 +26,7 @@ to be uploaded on Rubygems
 * **stats_interval**: how often to poll Docker containers for stats. The default is every minute.
 * **cgroup_path**: The path to cgroups pseudofiles. The default is `/sys/fs/cgroup`.
 * **tag_prefix**: The tag prefix. The default value is "docker"
-* **docker_socket**: docker socker path. Default: `unix:///var/run/docker.sock)`
+* **docker_socket**: docker socker path. Default: `unix:///var/run/docker.sock`
 * **docker_network_path**: path to network informations. Default: `/sys/class/net`
 * **docker_infos_path**: path to json files container.json and state.json . Default: `/var/lib/docker/execdriver/native`
 ## Example output
