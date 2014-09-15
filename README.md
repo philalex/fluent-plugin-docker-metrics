@@ -12,9 +12,8 @@ To build the gem with Docker:
 ```
 docker build .
 docker run -v **/host_directory**:/gem **<image id>**
-
-You can find the gem in your **/host_directory**
 ```
+You can find the gem in your **/host_directory**
 
 ## Example config
 
