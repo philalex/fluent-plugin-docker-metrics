@@ -6,9 +6,15 @@ This is a [Fluentd](http://www.fluentd.org) plugin to collect Docker metrics per
 
 It's assumed to run on the host server. It periodically runs `docker ps --no-trunc -q` to get a list of running Docker container IDs, and it looks at `/sys/fs/cgroups/<metric_type>/docker/<container_id>/` for relevant stats, `/var/lib/docker/execdriver/native` to get docker interface name and `/sys/class/net` to read network statistics. You can say this is an implementation of the metric collection strategy outlined in [this blog post](http://blog.docker.com/2013/10/gathering-lxc-docker-containers-metrics/).
 
-## Installing
+## How to build (with Docker)
 
-to be uploaded on Rubygems
+To build the gem with Docker:
+```
+docker build .
+docker run -v **/host_directory**:/gem **<image id>**
+
+You can find the gem in your **/host_directory**
+```
 
 ## Example config
 
@@ -26,7 +32,7 @@ to be uploaded on Rubygems
 * **tag_prefix**: The tag prefix. The default value is "docker"
 * **docker_socket**: docker socker path. Default: `unix:///var/run/docker.sock`
 * **docker_network_path**: path to network informations. Default: `/sys/class/net`
-* **docker_infos_path**: path to json files container.json and state.json . Default: `/var/lib/docker/execdriver/native`
+* **docker_infos_path**: path to json files `container.json` and `state.json`. Default: `/var/lib/docker/execdriver/native`
 
 
 ## Example output
