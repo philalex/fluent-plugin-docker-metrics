@@ -37,9 +37,9 @@ You can find the gem in your **/host_directory**
 ## Example output
 
 ```
-20140909T123247+0000    docker.memory.stat      {"key":"total_unevictable","value":0,"type":"jauge","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
-20140909T123247+0000    docker.cpuacct.stat     {"key":"user","value":1094,"type":"jauge","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
-20140909T123247+0000    docker.cpuacct.stat     {"key":"system","value":302,"type":"jauge","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
+20140909T123247+0000    docker.memory.stat      {"key":"total_unevictable","value":0,"type":"gauge","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
+20140909T123247+0000    docker.cpuacct.stat     {"key":"user","value":1094,"type":"gauge","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
+20140909T123247+0000    docker.cpuacct.stat     {"key":"system","value":302,"type":"gauge","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
 20140909T123247+0000    docker.network.stat     {"key":"rx_bytes","value":648,"type":"counter","if_name":"veth8590","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
 20140909T123247+0000    docker.network.stat     {"key":"tx_bytes","value":0,"type":"counter","if_name":"veth8590","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
 20140909T123247+0000    docker.network.stat     {"key":"tx_packets","value":0,"type":"counter","if_name":"veth8590","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
