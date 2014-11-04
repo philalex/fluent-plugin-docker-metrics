@@ -46,6 +46,14 @@ You can find the gem in your **/host_directory**
 20140909T123247+0000    docker.network.stat     {"key":"rx_packets","value":8,"type":"counter","if_name":"veth8590","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
 20140909T123247+0000    docker.network.stat     {"key":"tx_errors","value":0,"type":"counter","if_name":"veth8590","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
 20140909T123247+0000    docker.network.stat     {"key":"rx_errors","value":0,"type":"counter","if_name":"veth8590","td_agent_hostname":"3f8f46d50a24","source":"3f8f46d50a24be540f0b7d8c725a037a0f56d9e89b89ad54f70a1cd400142cb0"}
+20141104T133202+0000    docker.blkio.throttle.io_serviced       {"key":"total","value":"352","device":"252:3","type":"gauge","td_agent_hostname":"a10d1198fffe","source":"a10d1198fffe5f8587f0c475791c170f8
+1dce8b54f3a8b08c90eb934edb0ba19"}
+20141104T133202+0000    docker.blkio.throttle.io_serviced       {"key":"total","value":"704","type":"gauge","td_agent_hostname":"a10d1198fffe","source":"a10d1198fffe5f8587f0c475791c170f81dce8b54f3a8b08c9
+0eb934edb0ba19"}
+20141104T133202+0000    docker.blkio.throttle.io_service_bytes  {"key":"read","value":"43425792","device":"8:0","type":"counter","td_agent_hostname":"a10d1198fffe","source":"a10d1198fffe5f8587f0c475791c1
+70f81dce8b54f3a8b08c90eb934edb0ba19"}
+20141104T133202+0000    docker.blkio.throttle.io_service_bytes  {"key":"write","value":"0","device":"8:0","type":"counter","td_agent_hostname":"a10d1198fffe","source":"a10d1198fffe5f8587f0c475791c170f81d
+ce8b54f3a8b08c90eb934edb0ba19"}
 ```
 
 In particular, each event is a key-value pair of individual metrics.
