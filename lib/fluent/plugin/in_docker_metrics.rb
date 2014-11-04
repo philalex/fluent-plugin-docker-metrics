@@ -3,11 +3,11 @@ module Fluent
   class DockerMetricsInput < Input
     Plugin.register_input('docker_metrics', self)
 
-    config_param :cgroup_path, :string, :default => '/stats/fs/cgroup'
+    config_param :cgroup_path, :string, :default => '/sys/fs/cgroup'
     config_param :stats_interval, :time, :default => 60 # every minute
     config_param :tag_prefix, :string, :default => "docker"
     config_param :docker_infos_path, :string, :default => '/var/lib/docker/execdriver/native'
-    config_param :docker_network_stats, :string, :default => '/stats/class/net'
+    config_param :docker_network_stats, :string, :default => '/sys/class/net'
     config_param :docker_socket, :string, :default => 'unix:///var/run/docker.sock'
 
     # Class variables
