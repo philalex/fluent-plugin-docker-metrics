@@ -3,15 +3,16 @@ module Fluent
   class DockerMetricsInput < Input
     Plugin.register_input('docker_metrics', self)
 
-    config_param :cgroup_path, :string, :default => '/sys/fs/cgroup'
+    config_param :cgroup_path, :string, :default => '/stats/fs/cgroup'
     config_param :stats_interval, :time, :default => 60 # every minute
     config_param :tag_prefix, :string, :default => "docker"
     config_param :docker_infos_path, :string, :default => '/var/lib/docker/execdriver/native'
-    config_param :docker_network_stats, :string, :default => '/sys/class/net'
+    config_param :docker_network_stats, :string, :default => '/stats/class/net'
     config_param :docker_socket, :string, :default => 'unix:///var/run/docker.sock'
 
     # Class variables
-    @@network_metrics = {'rx_bytes' => 'counter', 
+    @@network_metrics = {
+      'rx_bytes' => 'counter', 
       'tx_bytes' => 'counter',
       'tx_packets' => 'counter',
       'rx_packets' => 'counter',
@@ -19,12 +20,100 @@ module Fluent
       'rx_errors' => 'counter'
     }
 
-    @@docker_metrics = { 'memory.stat' => 'memory',
-      'cpuacct.stat' => 'cpuacct',
-      'blkio.io_serviced' => 'blkio',
-      'blkio.io_service_bytes' => 'blkio', 
-      'blkio.io_service_queued' => 'blkio', 
-      'blkio.sectors' => 'blkio'}
+    #
+    # memory: http://lxr.free-electrons.com/source/Documentation/cgroups/memory.txt
+    # cpuacct: http://lxr.free-electrons.com/source/Documentation/cgroups/cpuacct.txt
+    # blkio: http://lxr.free-electrons.com/source/Documentation/cgroups/blkio-controller.txt
+    #
+    @@docker_metrics = {
+      'memory.stat' => { 
+        'type' => 'memory',
+        'parser' => 'KeyValueStatsParser',
+        'counter' => 'gauge'
+      },
+      
+      'cpuacct.stat' => { 
+        'type' => 'cpuacct',
+        'parser' => 'KeyValueStatsParser',
+        'counter' => 'gauge'
+      },
+      'cpuacct.usage' => {
+        'type' => 'cpuacct',
+        'parser' =>' SimpleValueParser',
+        'counter' => 'counter'
+      },
+      'blkio.io_service_bytes' => {
+        'type' => 'blkio',
+        'parser' => 'BlkioStatsParser',
+        'counter' => 'gauge'
+      },
+      'blkio.io_queued_recursive' => {
+        'type' => 'blkio',
+        'parser' => 'KeyValueStatsParser',
+        'counter' => 'gauge'
+      },
+      'blkio.io_merged_recursive' => {
+        'type' => 'blkio',
+        'parser' => 'KeyValueStatsParser',
+        'counter' => 'gauge'
+      },
+      'blkio.io_wait_time_recursive' => {
+        'type' => 'blkio',
+        'parser' => 'BlkioStatsParser',
+        'counter' => 'gauge'
+      },
+      'blkio.io_service_time_recursive' => {
+        'type' => 'blkio',
+        'parser' => 'BlkioStatsParser',
+        'counter' => 'gauge'
+      },
+      'blkio.io_serviced_recursive' => {
+        'type' => 'blkio',
+        'parser' => 'BlkioStatsParser',
+        'counter' => 'gauge'
+      },
+      'blkio.io_service_bytes_recursive' => {
+        'type' => 'blkio',
+        'parser' => 'BlkioStatsParser',
+        'counter' => 'gauge'
+      },
+      'blkio.io_queued' => {
+        'type' => 'blkio',
+        'parser' => 'KeyValueStatsParser',
+        'counter' => 'gauge'
+      },
+      'blkio.io_merged' => {
+        'type' => 'blkio',
+        'parser' => 'KeyValueStatsParser',
+        'counter' => 'gauge'
+      },
+      'blkio.io_wait_time' => {
+        'type' => 'blkio',
+        'parser' => 'BlkioStatsParser',
+        'counter' => 'gauge'
+      },
+      'blkio.io_service_time' => {
+        'type' => 'blkio',
+        'parser' => 'BlkioStatsParser',
+        'counter' => 'gauge'
+      },
+
+      'blkio.io_serviced' => {
+        'type' => 'blkio',
+        'parser' => 'BlkioStatsParser',
+        'counter' => 'gauge'
+      },
+      'blkio.throttle.io_serviced' => {
+        'type' => 'blkio',
+        'parser' => 'BlkioStatsParser',
+        'counter' => 'gauge'
+      },
+      'blkio.throttle.io_service_bytes' => {
+        'type' => 'blkio',
+        'parser' => 'BlkioStatsParser',
+        'counter' => 'counter'
+      }
+    }
 
     def initialize
       super
@@ -35,7 +124,6 @@ module Fluent
 
     def configure(conf)
       super
-
     end
 
     def start
@@ -70,8 +158,8 @@ module Fluent
     # Metrics collection methods
     def get_metrics
       list_container_ids.each do |id|
-        @@docker_metrics.each do |metric_name, metric_type|
-          emit_container_metric(id, metric_name, metric_type) 
+        @@docker_metrics.each do |metric_name, metric_infos|
+          emit_container_metric(id, metric_name, metric_infos) 
         end
 
         interface_name, interface_path = get_interface_path(id)
@@ -109,25 +197,23 @@ module Fluent
       Engine.emit_stream(tag, mes)
     end
 
-    def emit_container_metric(id, metric_filename, metric_type, opts = {})
-      path = "#{@cgroup_path}/#{metric_type}/docker/#{id}/#{metric_filename}"
+    def emit_container_metric(id, metric_filename, metric_infos, opts = {})
+      path = "#{@cgroup_path}/#{metric_infos['type']}/docker/#{id}/#{metric_filename}"
       if File.exists?(path)
-        parser = if metric_type != 'blkio'
-                   KeyValueStatsParser.new(path, metric_filename.gsub('.', '_'))
-                 else 
+        parser = case metric_infos['parser']
+                 when 'BlkioStatsParser'
                    BlkioStatsParser.new(path, metric_filename.gsub('.', '_'))
+                 when 'KeyValueStatsParser'
+                   KeyValueStatsParser.new(path, metric_filename.gsub('.', '_'))
+                 else
+                   SimpleValueParser.new(path, metric_filename.gsub('.', '_'))
                  end
         time = Engine.now
         tag = "#{@tag_prefix}.#{metric_filename}"
         mes = MultiEventStream.new
         parser.parse_each_line do |data|
           next if not data
-          # TODO: address this more elegantly
-          if data[:key] =~ /^(?:cpuacct|blkio|memory_stat_pg)/
-            data[:type] = 'counter'
-          else
-            data[:type] = 'gauge'
-          end
+          data['type'] = metric_infos['counter']
           data[:td_agent_hostname] = "#{@hostname}"
           data[:source] = "#{id}"
           mes.add(time, data)
@@ -175,11 +261,18 @@ module Fluent
       end
     end
 
+    class SimpleValueParser < CGroupStatsParser
+      def parse_line(line)
+        metric_name = @metric_type.split('_')[1]
+        { key: metric_name.downcase, valeur: line.to_i }
+      end
+    end
+
     class KeyValueStatsParser < CGroupStatsParser
       def parse_line(line)
         k, v = line.split(/\s+/, 2)
         if k and v
-          { key: k, value: v.to_i }
+          { key: k.downcase, value: v.to_i }
         else
           nil
         end
@@ -187,14 +280,20 @@ module Fluent
     end
 
     class BlkioStatsParser < CGroupStatsParser
+      TotalLineRegExp = /^Total (?<value>\d+)/
       BlkioLineRegexp = /^(?<major>\d+):(?<minor>\d+) (?<key>[^ ]+) (?<value>\d+)/
       
       def parse_line(line)
-        m = BlkioLineRegexp.match(line)
+        m = TotalLineRegExp.match(line)
         if m
-          { key: m["key"].downcase, value: m["value"] }
+          { key: 'total', value: m['value']}
         else
-          nil
+          m = BlkioLineRegexp.match(line)
+          if m
+            { key: m["key"].downcase, value: m["value"] , device: m['major'] + ':' + m['minor']}
+          else
+            nil
+          end
         end
       end
     end
