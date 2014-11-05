@@ -264,7 +264,7 @@ module Fluent
     class SimpleValueParser < CGroupStatsParser
       def parse_line(line)
         metric_name = @metric_type.split('_')[1]
-        { key: metric_name.downcase, valeur: line.to_i }
+        { key: metric_name.downcase, value: line.to_i }
       end
     end
 
