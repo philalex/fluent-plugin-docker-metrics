@@ -29,7 +29,7 @@ module Fluent
       'memory.stat' => { 
         'type' => 'memory',
         'parser' => 'KeyValueStatsParser',
-        'counter' => {'default':'gauge','(total_)?pg.*':'counter'}
+        'counter' => {'default' => 'gauge','(total_)?pg.*' => 'counter'}
       },
       
       'cpuacct.stat' => { 
@@ -218,14 +218,18 @@ module Fluent
 	    defaulttype = metric_infos['counter']['default']
             choices = metric_infos['counter'].select { |key, value| !key.to_s.match(/^default$/) }
             choices.each do |regex, countertype|
-              if data['key'].match(/#{regex}/)
+              if data[:key].match(/#{regex}/)
                 found = 1
                 data['type'] = countertype
                 break
+              end
+            end
             if found == 0
 	      data['type'] = defaulttype
+	    end
           else
             data['type'] = metric_infos['counter']
+          end
           data[:td_agent_hostname] = "#{@hostname}"
           data[:source] = "#{id}"
           mes.add(time, data)
