@@ -29,13 +29,13 @@ module Fluent
       'memory.stat' => { 
         'type' => 'memory',
         'parser' => 'KeyValueStatsParser',
-        'counter' => 'gauge'
+        'counter' => {'default':'gauge','(total_)?pg.*':'counter'}
       },
       
       'cpuacct.stat' => { 
         'type' => 'cpuacct',
         'parser' => 'KeyValueStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'cpuacct.usage' => {
         'type' => 'cpuacct',
@@ -45,68 +45,68 @@ module Fluent
       'blkio.io_service_bytes' => {
         'type' => 'blkio',
         'parser' => 'BlkioStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'blkio.io_queued_recursive' => {
         'type' => 'blkio',
         'parser' => 'KeyValueStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'blkio.io_merged_recursive' => {
         'type' => 'blkio',
         'parser' => 'KeyValueStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'blkio.io_wait_time_recursive' => {
         'type' => 'blkio',
         'parser' => 'BlkioStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'blkio.io_service_time_recursive' => {
         'type' => 'blkio',
         'parser' => 'BlkioStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'blkio.io_serviced_recursive' => {
         'type' => 'blkio',
         'parser' => 'BlkioStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'blkio.io_service_bytes_recursive' => {
         'type' => 'blkio',
         'parser' => 'BlkioStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'blkio.io_queued' => {
         'type' => 'blkio',
         'parser' => 'KeyValueStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'blkio.io_merged' => {
         'type' => 'blkio',
         'parser' => 'KeyValueStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'blkio.io_wait_time' => {
         'type' => 'blkio',
         'parser' => 'BlkioStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'blkio.io_service_time' => {
         'type' => 'blkio',
         'parser' => 'BlkioStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
 
       'blkio.io_serviced' => {
         'type' => 'blkio',
         'parser' => 'BlkioStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'blkio.throttle.io_serviced' => {
         'type' => 'blkio',
         'parser' => 'BlkioStatsParser',
-        'counter' => 'gauge'
+        'counter' => 'counter'
       },
       'blkio.throttle.io_service_bytes' => {
         'type' => 'blkio',
@@ -213,7 +213,19 @@ module Fluent
         mes = MultiEventStream.new
         parser.parse_each_line do |data|
           next if not data
-          data['type'] = metric_infos['counter']
+	  if metric_infos['counter'].class == Hash
+            found = 0
+	    defaulttype = metric_infos['counter']['default']
+            choices = metric_infos['counter'].select { |key, value| !key.to_s.match(/^default$/) }
+            choices.each do |regex, countertype|
+              if data['key'].match(/#{regex}/)
+                found = 1
+                data['type'] = countertype
+                break
+            if found == 0
+	      data['type'] = defaulttype
+          else
+            data['type'] = metric_infos['counter']
           data[:td_agent_hostname] = "#{@hostname}"
           data[:source] = "#{id}"
           mes.add(time, data)
