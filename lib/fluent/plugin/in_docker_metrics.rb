@@ -49,12 +49,12 @@ module Fluent
       },
       'blkio.io_queued_recursive' => {
         'type' => 'blkio',
-        'parser' => 'KeyValueStatsParser',
+        'parser' => 'BlkioStatsParser',
         'counter' => 'counter'
       },
       'blkio.io_merged_recursive' => {
         'type' => 'blkio',
-        'parser' => 'KeyValueStatsParser',
+        'parser' => 'BlkioStatsParser',
         'counter' => 'counter'
       },
       'blkio.io_wait_time_recursive' => {
@@ -79,12 +79,12 @@ module Fluent
       },
       'blkio.io_queued' => {
         'type' => 'blkio',
-        'parser' => 'KeyValueStatsParser',
+        'parser' => 'BlkioStatsParser',
         'counter' => 'counter'
       },
       'blkio.io_merged' => {
         'type' => 'blkio',
-        'parser' => 'KeyValueStatsParser',
+        'parser' => 'BlkioStatsParser',
         'counter' => 'counter'
       },
       'blkio.io_wait_time' => {
@@ -302,7 +302,7 @@ module Fluent
       def parse_line(line)
         m = TotalLineRegExp.match(line)
         if m
-          { key: 'total', value: m['value']}
+          { key: 'total', value: m['value'], device: ""}
         else
           m = BlkioLineRegexp.match(line)
           if m
