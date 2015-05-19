@@ -163,9 +163,11 @@ module Fluent
         end
 
         interface_name, interface_path = get_interface_path(id)
-       
-        @@network_metrics.each do |metric_name, metric_type|
-          emit_container_network_metric(id, interface_name, interface_path, metric_name, metric_type)
+
+        if interface_name
+          @@network_metrics.each do |metric_name, metric_type|
+            emit_container_network_metric(id, interface_name, interface_path, metric_name, metric_type)
+          end
         end
       end
       
